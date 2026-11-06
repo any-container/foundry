@@ -1,0 +1,4 @@
+[submodule "implementations/rails-template"]
+	path = implementations/rails-template
+	url = https://github.com/any-container/rails-template
+	branch = main
