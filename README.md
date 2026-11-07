@@ -18,7 +18,7 @@ Layer files use [OKF v0.2](https://github.com/GoogleCloudPlatform/open-knowledge
     status: stable
     ---
 
-Only files with `type: Layer` register. Payload files under `layers/<name>/files/` are copied into host apps and carry no layer front matter. `children` is not written by hand; it is filled in when a child registers. A parent must be registered in an earlier commit than its child.
+Only files with `type: Layer` register. Payload files under `layers/<name>/rails/` are copied into host apps and carry no layer front matter. `children` is not written by hand; it is filled in when a child registers. A parent must be registered in an earlier commit than its child.
 
 ## Registration
 
