@@ -1,7 +1,8 @@
 name: "Create layer"
 # Registers every commit of a PR labelled `layer` (oldest first) in foundry.sqlite3,
 # commits the updated database to the PR branch, and comments the result.
-# The database commit is pushed with GITHUB_TOKEN, so it does not re-trigger this workflow.
+# The database commit carries [skip ci], so GitHub creates no run for it (a GITHUB_TOKEN push to a PR
+# otherwise creates a run that waits for approval). The guard step below also skips it.
 on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
@@ -68,7 +69,7 @@ jobs:
           git config user.name "$PR_AUTHOR_LOGIN"
           git config user.email "${PR_AUTHOR_ID}+${PR_AUTHOR_LOGIN}@users.noreply.github.com"
           git add foundry.sqlite3
-          git commit -m "Register layers up to ${{ steps.register.outputs.short }} in foundry database"
+          git commit -m "Register layers up to ${{ steps.register.outputs.short }} in foundry database [skip ci]"
           git push
       - name: Comment result
         if: always() && steps.guard.outputs.skip != 'true'
