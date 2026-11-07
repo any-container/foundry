@@ -79,4 +79,10 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           if [ "$STATUS" = "0" ]; then icon="✅ Success"; else icon="❌ Failure"; fi
-          gh pr comment "$PR" --body "$(printf '%s: head `%s`\n\n```\n%s\n```' "$icon" "$SHORT" "$RESULT")"
+          # Plain-text dump of the layers table, since foundry.sqlite3 shows no diff on GitHub
+          dump=$(ruby -rsqlite3 -e '
+            db = SQLite3::Database.new("foundry.sqlite3")
+            puts "rowid | name | id | parents | siblings | children"
+            db.execute("SELECT rowid, name, id, parents, siblings, children FROM layers ORDER BY rowid") { |r| puts r.join(" | ") }
+          ' 2>&1)
+          gh pr comment "$PR" --body "$(printf '%s: head `%s`\n\n```\n%s\n```\n\nfoundry.sqlite3 `layers`:\n\n```\n%s\n```' "$icon" "$SHORT" "$RESULT" "$dump")"
