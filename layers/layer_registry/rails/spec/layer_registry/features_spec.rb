@@ -21,28 +21,28 @@ RSpec.describe Features do
       extra: { depends_on: ["base"], gems: [{ name: "rotp", version: "~> 6.3" }] }
     }
   end
-  let(:manifest) { { FEATURE_BASE: "true", FEATURE_EXTRA: "false" } }
+  let(:manifest) { { LAYER_BASE: "true", LAYER_EXTRA: "false" } }
 
   describe "Registry#load_env!" do
     it "sets manifest values in ENV and keeps values already set" do
-      vars = env(FEATURE_EXTRA: "true")
+      vars = env(LAYER_EXTRA: "true")
       build(manifest: manifest, features: features, env: vars).load_env!
-      expect(vars).to eq(env(FEATURE_BASE: "true", FEATURE_EXTRA: "true"))
+      expect(vars).to eq(env(LAYER_BASE: "true", LAYER_EXTRA: "true"))
     end
   end
 
   describe "Registry#enabled?" do
     it "follows ENV" do
-      registry = build(manifest: manifest, features: features, env: env(FEATURE_EXTRA: "on"))
+      registry = build(manifest: manifest, features: features, env: env(LAYER_EXTRA: "on"))
       expect(registry.enabled?(:extra)).to be true
     end
 
     it "is false when toggled off" do
-      expect(build(manifest: manifest, features: features, env: env(FEATURE_EXTRA: "false")).enabled?(:extra)).to be false
+      expect(build(manifest: manifest, features: features, env: env(LAYER_EXTRA: "false")).enabled?(:extra)).to be false
     end
 
     it "is true for an always_on feature whatever its ENV value" do
-      expect(build(manifest: manifest, features: features, env: env(FEATURE_BASE: "false")).enabled?(:base)).to be true
+      expect(build(manifest: manifest, features: features, env: env(LAYER_BASE: "false")).enabled?(:base)).to be true
     end
 
     it "raises for an unknown feature" do
@@ -62,13 +62,13 @@ RSpec.describe Features do
     end
 
     it "fails when a feature has no manifest entry" do
-      registry = build(manifest: { FEATURE_BASE: "true" }, features: features)
-      expect { registry.validate! }.to raise_error(Features::Invalid, /FEATURE_EXTRA/)
+      registry = build(manifest: { LAYER_BASE: "true" }, features: features)
+      expect { registry.validate! }.to raise_error(Features::Invalid, /LAYER_EXTRA/)
     end
 
     it "fails when a manifest entry has no description" do
-      registry = build(manifest: manifest.merge(FEATURE_GHOST: "true"), features: features)
-      expect { registry.validate! }.to raise_error(Features::Invalid, /FEATURE_GHOST/)
+      registry = build(manifest: manifest.merge(LAYER_GHOST: "true"), features: features)
+      expect { registry.validate! }.to raise_error(Features::Invalid, /LAYER_GHOST/)
     end
 
     it "fails on an unknown dependency" do
@@ -78,7 +78,7 @@ RSpec.describe Features do
 
     it "fails on a dependency cycle" do
       registry = build(
-        manifest: { FEATURE_A: "false", FEATURE_B: "false" },
+        manifest: { LAYER_A: "false", LAYER_B: "false" },
         features: { a: { depends_on: ["b"] }, b: { depends_on: ["a"] } }
       )
       expect { registry.validate! }.to raise_error(Features::Invalid, /cycle/)
@@ -86,9 +86,9 @@ RSpec.describe Features do
 
     it "fails when a feature is on and its dependency is off" do
       registry = build(
-        manifest: { FEATURE_A: "true", FEATURE_B: "false" },
+        manifest: { LAYER_A: "true", LAYER_B: "false" },
         features: { a: { depends_on: ["b"] }, b: {} },
-        env: env(FEATURE_A: "true", FEATURE_B: "false")
+        env: env(LAYER_A: "true", LAYER_B: "false")
       )
       expect { registry.validate! }.to raise_error(Features::Invalid, /dependency b is off/)
     end

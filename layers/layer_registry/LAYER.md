@@ -14,12 +14,12 @@ Tracks which layers are built into the app and which are switched on in this dep
 
 ## Concepts
 - One description file per layer, with `always_on`, `depends_on` (layer names) and `gems` metadata.
-- One manifest mapping each layer to an ENV variable, `FEATURE_<NAME>`, set to `"true"` or `"false"`.
+- One manifest mapping each layer to an ENV variable, `LAYER_<NAME>`, set to `"true"` or `"false"`.
 - Real ENV overrides the manifest. An `always_on` layer is enabled whatever its ENV value.
 - Boot validates the registry and fails if it is inconsistent (missing description or entry, unknown dependency, cycle, enabled layer with a disabled dependency).
 
 ## Configuration
-Per deployment: `FEATURE_<NAME>` ENV variables.
+Per deployment: `LAYER_<NAME>` ENV variables.
 
 ## Interface
 

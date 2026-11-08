@@ -8,7 +8,7 @@ gems: []
 Tracks which features are built into this app and which are switched on in this deployment.
 
 - `features/<name>.md` describes one feature. The front matter lists `always_on`, `depends_on` (feature names), and `gems` (name and optional version).
-- `features/0-manifest.yml` maps each feature to its ENV variable, `FEATURE_<NAME>`.
+- `features/0-manifest.yml` maps each feature to its ENV variable, `LAYER_<NAME>`.
 - `config/features.rb` defines `Features`.
 - `config/initializers/00_features.rb` loads the manifest into ENV and validates it at boot.
 

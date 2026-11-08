@@ -14,7 +14,7 @@ Run from the host app root:
 
 The template:
 - Copies `features/layer_registry.md` (this layer's description) into the app's root `features/` folder.
-- Creates `features/0-manifest.yml`. If the host already has one, it is kept and `FEATURE_LAYER_REGISTRY: "true"` is appended once.
+- Creates `features/0-manifest.yml`. If the host already has one, it is kept and `LAYER_LAYER_REGISTRY: "true"` is appended once.
 - Copies `config/features.rb` (the `Features` module) and `config/initializers/00_features.rb`.
 - Copies `spec/layer_registry/features_spec.rb`.
 - Makes no gem or route edits. Runs no migrations.
@@ -24,7 +24,7 @@ The app's `features/` folder holds:
 
 | File | Contents |
 |------|----------|
-| `0-manifest.yml` | Flat map of `FEATURE_<NAME>` to `"true"` or `"false"`. The static representation of the feature ENV variables. |
+| `0-manifest.yml` | Flat map of `LAYER_<NAME>` to `"true"` or `"false"`. The static representation of the feature ENV variables. |
 | `<name>.md` | One description per feature. Front matter keys: `always_on` (default false), `depends_on` (feature names), `gems` (a name, or `name` and `version`). The body is free text. |
 
 At boot the initializer copies each manifest entry into `ENV` unless the deployment already sets that variable, so real ENV overrides the manifest. It then validates:
@@ -48,7 +48,7 @@ An `always_on` feature is enabled whatever its ENV value.
 Every layer ships `rails/features/<name>.md` with its front matter and appends its entry to the manifest in `template.rb`:
 
     manifest = "features/0-manifest.yml"
-    append_to_file manifest, %(FEATURE_<NAME>: "false"\n) unless File.read(manifest).include?("FEATURE_<NAME>:")
+    append_to_file manifest, %(LAYER_<NAME>: "false"\n) unless File.read(manifest).include?("LAYER_<NAME>:")
 
 ## Testing
 `bundle exec rspec spec/layer_registry`

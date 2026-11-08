@@ -16,7 +16,7 @@ module Features
       @env = env
     end
 
-    def env_key(name) = "FEATURE_#{name.to_s.upcase}"
+    def env_key(name) = "LAYER_#{name.to_s.upcase}"
 
     # Sets each manifest entry in ENV unless the environment already defines it.
     def load_env!
