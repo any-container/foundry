@@ -8,10 +8,10 @@ Layer files use [OKF v0.2](https://github.com/GoogleCloudPlatform/open-knowledge
 
     ---
     type: Layer
-    title: Feature Registry
-    description: Per-deployment feature toggles.
+    title: Layer Registry
+    description: Per-deployment layer toggles.
     tags: [feature]
-    layer: feature_registry        # layer name, required
+    layer: layer_registry          # layer name, required
     parents: [other_layer]         # names; must already be registered (earlier commit)
     siblings: [another_layer]      # names; must already be registered; one-way
     generated: { by: human:thom, at: 2026-11-05T00:00:00Z }
