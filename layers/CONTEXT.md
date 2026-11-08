@@ -1,6 +1,24 @@
 # Layers
 
-One folder per layer. A layer is one end-to-end feature implementation, committed together. See [../README.md](../README.md) for front matter and registration.
+One folder per layer. A layer is one end-to-end feature implementation, committed together. See [../README.md](../README.md) for registration.
+
+## Front matter
+
+Layer files use [OKF v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format) front matter. `type: Layer` marks a layer file; `layer`, `parents` and `siblings` are OKF extension keys.
+
+    ---
+    type: Layer
+    title: Layer Registry
+    description: Per-deployment layer toggles.
+    tags: [feature]
+    layer: layer_registry          # layer name, required
+    parents: [other_layer]         # names; must already be registered (earlier commit)
+    siblings: [another_layer]      # names; must already be registered; one-way
+    generated: { by: human:thom, at: 2026-11-05T00:00:00Z }
+    status: stable
+    ---
+
+Only files with `type: Layer` register. Payload files under `layers/<name>/rails/` are copied into host apps and carry no layer front matter. `children` is not written by hand; it is filled in when a child registers. A parent must be registered in an earlier commit than its child.
 
 ## Structure
 
@@ -11,7 +29,7 @@ One folder per layer. A layer is one end-to-end feature implementation, committe
         template.rb              Rails app template that injects the payload
         <stack>/                 one folder per implementation, for example `rails/`
           LAYER.md               stack-specific details; no front matter; not copied into host apps
-          ...                    payload, laid out as it appears in the host app root
+          ...                    payload, laid out as it will appear in the host app
 
 | Path | Contents |
 |------|----------|
