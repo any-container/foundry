@@ -10,7 +10,7 @@ status: stable
 
 # Layer Registry
 
-Tracks which layers are built into the app and which are switched on in this deployment. Layers are toggled per deployment through ENV variables; the static default for each lives in a manifest. Every other layer that is toggled depends on this one and must be injected after it.
+Tracks which layers are built into the app and which are switched on in this deployment. Layers are toggled per deployment through ENV variables; the static default for each lives in a manifest.
 
 ## Concepts
 - One description file per layer, with `always_on`, `depends_on` (layer names) and `gems` metadata.
@@ -23,11 +23,11 @@ Per deployment: `LAYER_<NAME>` ENV variables.
 
 ## Interface
 
-    Features.enabled?(:name)   # toggled on, and every dependency enabled
-    Features.toggled?(:name)   # this layer's own switch only
-    Features.built?(:name)     # a description file exists
-    Features.names             # every built layer
-    Features.gems              # gems of every built layer
+    Layers.enabled?(:name)   # toggled on, and every dependency enabled
+    Layers.toggled?(:name)   # this layer's own switch only
+    Layers.built?(:name)     # a description file exists
+    Layers.names             # every built layer
+    Layers.gems              # gems of every built layer
 
 ## Implementations
 | Folder | Stack | Details |

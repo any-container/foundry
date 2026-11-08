@@ -1,8 +1,8 @@
 require "forwardable"
 require "yaml"
 
-# Feature registry. See features/layer_registry.md.
-module Features
+# Layer registry. See layers/layer_registry.md.
+module Layers
   MANIFEST = "0-manifest.yml".freeze
   TRUE_VALUES = %w[true 1 yes on].freeze
 
@@ -45,7 +45,7 @@ module Features
       errors = []
       keys = manifest.keys.map(&:to_s)
       names.each { |name| errors << "#{name}: no #{env_key(name)} in #{MANIFEST}" unless keys.include?(env_key(name)) }
-      keys.each { |key| errors << "#{key}: no description file in features/" unless names.any? { |name| env_key(name) == key } }
+      keys.each { |key| errors << "#{key}: no description file in layers/" unless names.any? { |name| env_key(name) == key } }
       definitions.each_value do |definition|
         definition.depends_on.each do |dep|
           errors << "#{definition.name}: unknown dependency #{dep}" unless built?(dep)
@@ -90,7 +90,7 @@ module Features
       )
     end
 
-    def fetch(name) = definitions.fetch(name.to_sym) { raise Invalid, "unknown feature #{name}" }
+    def fetch(name) = definitions.fetch(name.to_sym) { raise Invalid, "unknown layer #{name}" }
 
     def cycles
       definitions.keys.filter_map do |start|
@@ -114,6 +114,6 @@ module Features
 
     def_delegators :registry, :load_env!, :validate!, :enabled?, :toggled?, :built?, :names, :gems, :env_key
 
-    def registry = @registry ||= Registry.new(dir: Rails.root.join("features"))
+    def registry = @registry ||= Registry.new(dir: Rails.root.join("layers"))
   end
 end
