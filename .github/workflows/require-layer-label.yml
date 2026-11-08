@@ -1,0 +1,31 @@
+name: "Require layer label"
+# Fails a PR that changes anything under layers/ unless it carries the `layer` label.
+# Re-runs when labels change, so adding the label turns the check green.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  require-layer-label:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HAS_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'layer') }}
+    steps:
+      - name: Check for layer label
+        run: |
+          changed=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files" --jq '.[] | .filename, (.previous_filename // empty)' | grep '^layers/' || true)
+          if [ -z "$changed" ]; then
+            echo "No changes under layers/."
+            exit 0
+          fi
+          if [ "$HAS_LABEL" = "true" ]; then
+            echo "Changes under layers/ and the layer label is present."
+            exit 0
+          fi
+          echo "::error::This PR changes files under layers/ but is not labelled 'layer'. Add the label so create-layer registers it."
+          echo "$changed" | head -20
+          exit 1
