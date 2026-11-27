@@ -4,33 +4,40 @@ Status: draft. Terms are defined in [CONTEXT.md](CONTEXT.md).
 
 Goal: a multi-stage growth CI, executed in Ruby, that grows a specimen one expression at a time and screens every step with specs and mutants.
 
-## Milestone: walking skeleton
+## Stages
 
-The smallest thing that proves the model end to end:
+Growth is built in two stages. The first trait in each stage is the pilot that builds and documents its part of the pipeline.
 
-- one medium trait (`routing_and_service_architecture`, Ruby on Rails) and one behavioural trait (`session`)
-- `session` has a key spec and at least one security spec
-- `rails-template` grows both expressions in two steps, with at least two mutants each
-- every step's screen passes in CI
+1. **Medium stage.** Migrate `routing_and_service_architecture` (Ruby on Rails), currently `layers/routing_and_service_architecture/`, into the first medium trait. That work builds the catalogue schema, specimen manifest, mutant format, screen runner and growth check, and documents each one.
+2. **Behavioural stage.** Add `session` as the first behavioural trait. That work adds Cucumber specs, the specimen contract and the spec runner.
+
+The walking skeleton is done when `rails-template` grows both expressions in two screened steps, each with at least two mutants.
 
 ## Steps
 
 Steps in order. Each depends on the ones before it unless marked as parallel.
 
+### Medium stage: `routing_and_service_architecture`
+
 | # | Step | Repo | Done when |
 |---|------|------|-----------|
-| 1 | **Choose spec technology.** | foundry | A decision is recorded. See [Spec technology](#spec-technology). |
-| 2 | **Spec format.** Location (`specs/<trait>/`), metadata: trait, `key`, `security`. One key spec per trait. | foundry | `CONTEXT.md` and `specs/CONTEXT.md` describe it; one example spec exists. |
-| 3 | **Specimen contract.** How the spec runner reaches a specimen: a boot command, a base URL, a health check, a reset between runs. | foundry | Documented; `rails-template` implements it. |
-| 4 | **Spec runner.** Runs a chosen set of specs against a base URL and writes one observation per spec as JSON. | foundry | Runs the example spec against `rails-template` locally and in CI. |
-| 5 | **Catalogue schema.** Add trait kind (behavioural or medium), media, strains and specs to `foundry.sqlite3`; register them from front matter. Parallel with 2–4. | foundry | `register_layer.rb` registers all four; strain completeness and portability are checked at registration. |
-| 6 | **Pathway queries.** `upstream(trait)`, `downstream(trait)`, and the key specs a mutant of a trait must pass. | foundry | Callable from the screen runner. |
-| 7 | **Specimen manifest.** The specimen declares its strain, its medium, the foundry commit it is pinned to, and for each expression its trait and blobs. | specimen | `rails-template` has a manifest for its existing code. |
-| 8 | **Mutant format.** One file per mutant under the expression: id, target spec, locus (blob SHA, path, start and end line:char) and the diff. | specimen | Format documented; a tool checks every locus against its blob. |
-| 9 | **Screen runner.** Runs the baseline, then each mutant: apply, boot, run its target spec (must fail) and the key specs of every trait not downstream (must pass), revert. Writes the observations. | foundry | Screens `rails-template` locally; output matches the rules. |
-| 10 | **Growth check.** On a specimen PR: exactly one new expression, in pathway order, with mutants; the whole screen passes, so earlier expressions still hold. | specimen | A required CI check on `rails-template`. |
-| 11 | **First medium trait.** Grow `routing_and_service_architecture` as step one. Needs an answer to [#12](https://github.com/any-container/foundry/issues/12). | both | Screen passes. |
-| 12 | **First behavioural trait.** Write `session` specs, grow its expression and mutants in `rails-template`. | both | Screen passes. The walking skeleton is done. |
+| 1 | **Answer [#12](https://github.com/any-container/foundry/issues/12) for this trait.** What its mutants and key spec are. Its existing `spec/architecture/standards_spec.rb` (RSpec, medium-specific) is the starting point; a mutant might remove a `STANDARDS.md` or break an `AGENTS.md` symlink. | foundry | #12 has an answer, at least for this trait. |
+| 2 | **Catalogue schema.** Add trait kind (behavioural or medium), media and strains to `foundry.sqlite3`; register them from front matter. Register Ruby on Rails as the first medium and this trait as its first medium trait. | foundry | `register_layer.rb` registers all three; strain completeness and portability are checked at registration. |
+| 3 | **Pathway queries.** `upstream(trait)`, `downstream(trait)`, and the key specs a mutant of a trait must pass. | foundry | Callable from the screen runner. |
+| 4 | **Specimen manifest.** The specimen declares its strain, its medium, the foundry commit it is pinned to, and for each expression its trait and blobs. | specimen | `rails-template` has a manifest with this trait's expression. |
+| 5 | **Mutant format.** One file per mutant under the expression: id, target spec, locus (blob SHA, path, start and end line:char) and the diff. | specimen | Format documented; a tool checks every locus against its blob; this trait has at least two mutants. |
+| 6 | **Screen runner.** Runs the baseline, then each mutant: apply, run its target spec (must fail) and the key specs of every trait not downstream (must pass), revert. Writes the observations. | foundry | Screens `rails-template` locally and in CI. |
+| 7 | **Growth check.** On a specimen PR: exactly one new expression, in pathway order, with mutants; the whole screen passes. | specimen | A required CI check on `rails-template`. Growing this trait as step one passes it. |
+| 8 | **Document the medium stage.** How to add a medium, a medium trait and its mutants. | foundry | A second medium trait could be added from the docs alone. |
+
+### Behavioural stage: `session`
+
+| # | Step | Repo | Done when |
+|---|------|------|-----------|
+| 9 | **Spec format.** Cucumber `.feature` files in `specs/<trait>/`, tagged `@key` (one per trait) and `@security`. Shared step definitions in Ruby, in foundry. Parallel with 1–8. | foundry | `specs/CONTEXT.md` describes it; one example feature exists. |
+| 10 | **Specimen contract.** How the spec runner reaches a specimen: a boot command, a base URL, a health check, a reset between runs. | foundry | Documented; `rails-template` implements it. |
+| 11 | **Spec runner.** Runs chosen features against a base URL with Cucumber, Capybara (browser) and an HTTP client, and writes one observation per scenario as JSON. The screen runner uses it, booting the specimen per mutant. | foundry | Runs the example feature against `rails-template` locally and in CI. |
+| 12 | **First behavioural trait.** Write `session` features, grow its expression and mutants in `rails-template`. | both | Screen passes. The walking skeleton is done. |
 
 Not on the critical path, later:
 
@@ -51,9 +58,16 @@ Specs are black-box: they talk to a running specimen over HTTP or through a brow
 | **Hurl** | Plain-text HTTP request and assertion files, run by a CLI. | Very readable for API and auth flows. Good for security checks on headers, cookies, redirects. | No browser. Not Ruby. Limited logic. |
 | **Schemathesis or similar** | Property-based fuzzing from an OpenAPI schema. | Strong security bias: finds what hand-written specs miss. | Needs a schema. A supplement, not the spec format. |
 
-Recommendation: RSpec + Capybara for every spec, since it is known and keeps one layer. Choose Cucumber instead if specs should read as documentation for non-Ruby readers. Hurl or Schemathesis can be added later as extra security specs.
+**Decision: Cucumber** for behavioural trait specs, with Ruby step definitions using Capybara and an HTTP client. Feature files double as readable documentation of the trait, and `@key` and `@security` tags carry the spec metadata. Medium traits may use medium-specific specs, such as RSpec in Ruby on Rails (see [#12](https://github.com/any-container/foundry/issues/12)). Hurl or Schemathesis can be added later as extra security specs.
 
 ## Pipelines
+
+Four diagrams:
+
+1. [Repositories](#repositories): how foundry and a specimen point at each other.
+2. [Catalogue registration](#catalogue-registration-foundry): how traits, specs, strains and media enter foundry.
+3. [Growth step](#growth-step-specimen-pr): the check on every specimen PR.
+4. [Screen](#screen): baseline, then each mutant against its target spec and key specs.
 
 ### Repositories
 
