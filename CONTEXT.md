@@ -26,6 +26,10 @@ The repository still uses the older term **layer** (`layers/`, `LAYER.md`, `regi
 | **Observation** | One spec run under one mutant, or under the unmutated baseline: passed or failed. |
 | **Phenotype** | All observations of one mutant. Derived, not stored. |
 
+## Open questions
+
+- **Mutants and key specs for medium traits.** Undecided whether medium traits have mutants and a key spec, and if so what they look like (a linting key spec would not be end to end). Tracked in [#12](https://github.com/any-container/foundry/issues/12).
+
 ## Rules
 
 - **Valid spec.** Every spec passes on the baseline, and at least one mutant fails it.
